@@ -29,43 +29,14 @@ async function getMovies(request, response, next) {
 
 async function createMovie(request, response, next) {
   try {
-    const { _id } = request.user;
-    const {
-      country,
-      director,
-      duration,
-      year,
-      description,
-      image,
-      trailerLink,
-      thumbnail,
-      movieId,
-      nameRU,
-      nameEN,
-    } = request.body;
-
-    await Movie.create({
-      country,
-      director,
-      duration,
-      year,
-      description,
-      image,
-      trailerLink,
-      thumbnail,
-      movieId,
-      owner: _id,
-      nameRU,
-      nameEN,
+    const movie = await Movie.create({
+      ...request.body,
+      owner: request.user._id,
     });
 
-    response.status(STATUS_CREATED).send({ message: 'Фильм добавлен' });
+    response.status(STATUS_CREATED).send(movie);
   } catch (err) {
-    if (err.name === 'ValidationError') {
-      next(new BadRequestError(movieValidationErrors.BadRequestError));
-    } else {
-      next(err);
-    }
+    next(err);
   }
 }
 
